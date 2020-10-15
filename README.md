@@ -1,3 +1,5 @@
+## Guidelines
+
 If not installed, download the latest version of couchbase. Then create the couchbase bucket with the correct name before running.
 
 Clone the repo.
