@@ -12,7 +12,7 @@ const exec = (difficulty) => {
 
   if(solveEfficient(m)) {
 
-    const solution = Object.assign([], m)
+    const solution = JSON.parse( JSON.stringify(m) )
 
     let x = LEVELS[difficulty]
 
