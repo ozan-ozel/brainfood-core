@@ -13,12 +13,7 @@ const initiate = async (req, res) => {
 
   // const result = await upsertGame({...game, token})
 
-  if(result.err) {
-    res.status(500).send({
-      status: unexpected_err,
-      message: JSON.stringify(err)
-    })
-  } else {
+  if(game && token) {
     res.status(200).send({
       status: success,
       result: {
@@ -26,6 +21,11 @@ const initiate = async (req, res) => {
         board: game.board,
         solution: game.solution
       }
+    })
+  } else {
+    res.status(500).send({
+      status: unexpected_err,
+      message: "Token or game can not be generated"
     })
   }
 }
