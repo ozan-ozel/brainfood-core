@@ -11,7 +11,7 @@ const initiate = async (req, res) => {
 
   const token = getToken()
 
-  const result = await upsertGame({...game, token})
+  // const result = await upsertGame({...game, token})
 
   if(result.err) {
     res.status(500).send({
@@ -21,7 +21,11 @@ const initiate = async (req, res) => {
   } else {
     res.status(200).send({
       status: success,
-      result
+      result: {
+        token,
+        board: game.board,
+        solution: game.solution
+      }
     })
   }
 }
