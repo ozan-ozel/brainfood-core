@@ -18,7 +18,7 @@ const exec = (difficulty) => {
 
     // console.log(sectorList)
 
-    let areaCounts = LEVELS[difficulty].areaCounts
+    let areaCounts = JSON.parse(JSON.stringify(LEVELS[difficulty].areaCounts))
 
     while(areaCounts.length !== 0) {
       let currSector = Math.floor(Math.random() * sectorList.length)
