@@ -16,9 +16,18 @@ const GAME_STATES = {
 
 const LEVELS = {
   SUDOKU: {
-    "EASY": 45,
-    "MEDIUM": 55,
-    "HARD": 65
+    "EASY": {
+      total: 36,
+      areaCounts: [6, 5, 5, 4, 4, 4, 3, 3, 2]
+    },
+    "MEDIUM": {
+      total: 31,
+      areaCounts: [6, 5, 4, 4, 3, 3, 2, 2, 2]
+    },
+    "HARD": {
+      total: 26,
+      areaCounts: [5, 4, 4, 3, 3, 2, 2, 2, 1]
+    }
   }
 }
 
