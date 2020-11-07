@@ -1,20 +1,105 @@
-const couchbase = require('couchbase')
+require('dotenv').config()
 
-const couchbase_url = process.env.COUCHDB_URL
+const pgp = require('pg-promise')({
+  capSQL: true // capitalize all generated SQL
+});
 
-const couchbase_username = process.env.COUCHDB_USERNAME
+// Preparing the connection details:
+const cn = 'postgres://' 
+  + process.env.PG_USER + ':'
+  + process.env.PG_PASSWORD + '@'
+  + process.env.PG_HOST + ':'
+  + process.env.PG_PORT + '/'
+  + process.env.PG_DATABASE_NAME;
 
-const couchbase_password = process.env.COUCHDB_PASSWORD
+// Creating a new database instance from the connection details:
+const db = pgp(cn);
 
-const cluster = new couchbase.Cluster(couchbase_url, {
-  username: couchbase_username,
-  password: couchbase_password
-})
-
-const dbHelper = (bucketName) => {
-  return cluster.bucket(bucketName).defaultCollection()
+if(process.env.NODE_ENV === "dev") {
+  db.connect()
+    .then(obj => {
+        // Can check the server version here (pg-promise v10.1.0+):
+        const serverVersion = obj.client.serverVersion;
+        console.log("server connection done")
+        obj.done(); // success, release the connection;
+    })
+    .catch(error => {
+        console.log('ERROR:', error.message || error);
+    });
 }
 
-module.exports = {
-  dbHelper
+// generic way to skip NULL/undefined values for strings:
+const str = (col) => {
+  return {
+      name: col,
+      skip: function () {
+          var val = this[col];
+          return val === undefined;
+      }
+  };
+}
+
+// generic way to skip NULL/undefined values for integers,
+// while parsing the type correctly:
+const int = (col) => {
+  return {
+      name: col,
+      skip: function () {
+          var val = this[col];
+          return val === null || val === undefined;
+      },
+      init: function () {
+          return parseInt(this[col]);
+      }
+  };
+}
+
+class FilterSet {
+  constructor(filters, options) {
+      if (!filters || typeof filters !== 'object') {
+          throw new TypeError('Parameter \'filters\' must be an object.');
+      }
+      this.filters = filters;
+      this.options = options;
+      this.rawType = true; // do not escape the result from toPostgres()
+  }
+
+  toPostgres(/*self*/) {
+      // let self = this
+      const keys = Object.keys(this.filters);
+
+      const filterKeys = [];
+
+      keys.forEach(el => {
+        if(this.filters[el])
+          filterKeys.push(el);
+      })
+
+      const s = filterKeys.map(
+        k => {
+         if(this.options && this.options[k] && this.options[k]['%LIKE%']) {
+            let tmp =
+              ((this.options && this.options[k] && this.options[k]['tbl']) 
+                ? (this.options[k]['tbl'] + '.') : '') +
+                pgp.as.name(k) + ' LIKE \'%${' + k + ':value}%\'' ;
+          
+            return tmp;
+          }
+          else {
+            let tmp = 
+              (this.options && this.options[k] && this.options[k]['tbl'] ? (this.options[k]['tbl'] + '.') : '') +
+                pgp.as.name(k) + ' = ${' + k + '}'
+            return tmp;
+          }
+        }).join(' AND '); 
+
+      return s==="" ? true : pgp.as.format(s, this.filters);
+  }
+}
+
+module.exports =   {
+  db,
+  str,
+  int,
+  FilterSet
 }
