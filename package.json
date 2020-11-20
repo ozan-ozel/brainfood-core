@@ -11,16 +11,16 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/node": "^14.11.1",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
-    "couchbase": "^3.0.6",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "helmet": "^4.1.1",
     "jest": "^26.4.2",
+    "jsonwebtoken": "^8.5.1",
     "nodemon": "^2.0.4",
-    "supertest": "^4.0.2",
-    "ts-node": "^9.0.0",
-    "typescript": "^4.0.3"
+    "pg-promise": "^10.7.3",
+    "socket.io": "^3.0.0",
+    "supertest": "^4.0.2"
   }
 }
